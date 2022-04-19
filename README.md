@@ -37,6 +37,9 @@
 ## Versions
 
 <pre>
+0.1.3
+  Delete unused files.
+
 0.1.1-0.1.2
   Updated README.md
   
