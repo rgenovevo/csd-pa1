@@ -3,7 +3,6 @@ package client;
 import jakarta.ws.rs.client.*;
 import jakarta.ws.rs.core.*;
 import org.glassfish.jersey.client.ClientConfig;
-import shared.Account;
 
 import java.net.URI;
 
@@ -12,89 +11,124 @@ public class TestClient {
     public static final String BASE_URI = "http://localhost:8080/";
 
     // ID of account for test
-    public static final String ID = "123";
+    public static final String ORIGIN = "123";
+    public static final String DESTINATION = "321";
 
     // Web target with base URI
     public static WebTarget target;
 
-    public static void main(String[] args)  {
-        Client client = ClientBuilder.newClient( new ClientConfig());
+    public static void main(String[] args) {
+        Client client = ClientBuilder.newClient(new ClientConfig());
         target = client.target(getBaseURI());
 
+        /* Initial ledger */
+        getLedger();
+
         /* Create new account */
-        createAccount();
+        createAccount(ORIGIN);
+        createAccount(DESTINATION);
+
+        createAccount(ORIGIN);
 
         /* Get account balance */
-        getBalance();
+        getBalance(ORIGIN);
+
+        getBalance("456");
 
         /* Send transaction money from an account to other */
-        sendTransaction();
+        sendTransaction( DESTINATION, ORIGIN,"10");
+        getBalance(ORIGIN);
+        getBalance(DESTINATION);
+
+        /* Obtain current ledger */
+        getLedger();
+        getBalance(ORIGIN);
+
+        /* Transactions */
+        sendTransaction(DESTINATION, ORIGIN, "10");
+        getBalance(ORIGIN);
+        getBalance(DESTINATION);
+
+        sendTransaction(ORIGIN, DESTINATION, "10");
+        getBalance(DESTINATION);
+        getBalance(ORIGIN);
+
+        /* Obtain final ledger */
+        getLedger();
     }
 
-    private static void createAccount() {
-        Invocation.Builder inv = target.path("account").
-                path(ID).
-                request();
+    private static void createAccount(String id) {
+        Invocation.Builder inv = target.path("account")
+                .path(id)
+                .request();
 
-        // TODO: Create a Json file to use Account class
-        Response response = inv.post(Entity.entity("json", MediaType.TEXT_PLAIN));
+        Response response = inv.accept(MediaType.TEXT_PLAIN)
+                .post(Entity.entity("json", MediaType.TEXT_PLAIN));
 
         String output = response.readEntity(String.class);
-
-        String request = inv.accept(MediaType.TEXT_PLAIN).
-                post(Entity.entity("json", MediaType.TEXT_PLAIN)).
-                toString();
+        String request = response.toString();
 
         System.out.println();
         System.out.println("Request:    " + request);
         System.out.println("Output:     " + output);
     }
 
-    private static void getBalance() {
-        Invocation.Builder inv = target.path("account").
-                path(ID).
-                request();
+    private static void getBalance(String id) {
+        Invocation.Builder inv = target
+                .path("account")
+                .path(id)
+                .request();
 
-        Response response = inv.get();
+        Response response = inv.accept(MediaType.TEXT_PLAIN)
+                .get(Response.class);
+
         String output = response.readEntity(String.class);
-
-        String request = inv.accept(MediaType.TEXT_PLAIN).
-                get(Response.class).
-                toString();
+        String request = response.toString();
 
         System.out.println();
         System.out.println("Request:    " + request);
         System.out.println("Output:     " + output);
     }
 
-    private static void sendTransaction() {
-        Invocation.Builder inv = target.path("transaction").
-                path(ID).
-                path("321").
-                path("10").
-                request();
+    private static void sendTransaction(String origin, String destination, String value) {
+        Invocation.Builder inv = target.path("transaction")
+                .path(origin)
+                .path(destination)
+                .path(value)
+                .request();
 
-        // TODO: Create a Json file to use Account class
-        Response response = inv.put(Entity.entity("json", MediaType.TEXT_PLAIN));
+        Response response = inv.accept(MediaType.TEXT_PLAIN)
+                .put(Entity.entity("json", MediaType.TEXT_PLAIN));
 
         String output = response.readEntity(String.class);
-
-        String request = inv.accept(MediaType.TEXT_PLAIN).
-                put(Entity.entity("json", MediaType.TEXT_PLAIN)).
-                toString();
+        String request = response.toString();
 
         System.out.println();
         System.out.println("Request:    " + request);
         System.out.println("Output:     " + output);
     }
 
+    private static void getLedger() {
+        Invocation.Builder inv = target.path("ledger")
+                .request();
+
+        Response response = inv.accept(MediaType.TEXT_PLAIN)
+                .get(Response.class);
+
+        String output = response.readEntity(String.class);
+        String request = response.toString();
+
+        System.out.println();
+        System.out.println("Request:    " + request);
+        System.out.println("Output:     \n" + output);
+    }
 
 
-    /** TODO:
+    /**
+     * TODO:
      *   GetExtract();
      *   GetTotalValue();
      *   GetGlobalLedgerValue();
-     *   GetLedger();
      */
 
     private static URI getBaseURI() {
