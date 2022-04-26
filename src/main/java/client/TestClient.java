@@ -2,14 +2,16 @@ package client;
 
 import jakarta.ws.rs.client.*;
 import jakarta.ws.rs.core.*;
-import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.SslConfigurator;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
+import javax.net.ssl.SSLContext;
 import java.net.URI;
-import java.util.Arrays;
+import java.security.KeyStore;
 
 public class TestClient {
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://localhost:8080/";
+    public static final String BASE_URI = "https://localhost:8080/";
 
     // ID of account for test
     public static final String ORIGIN = "123";
@@ -18,55 +20,12 @@ public class TestClient {
     // Web target with base URI
     public static WebTarget target;
 
-    public static void main(String[] args) {
-        Client client = ClientBuilder.newClient(new ClientConfig());
+    public static void main(String[] args) throws Exception {
+        //Client client = ClientBuilder.newClient(new ClientConfig());
+        Client client = provideAuth();
         target = client.target(getBaseURI());
 
-        /* Initial ledger and global value*/
-        getLedger();
-        getGlobalLedgerValue();
-
-        /* Create new account */
-        createAccount(ORIGIN);
-        createAccount(DESTINATION);
-
-        createAccount(ORIGIN);
-
-        /* Get account balance */
-        getBalance(ORIGIN);
-
-        getBalance("456");
-
-        /* Send transaction money from an account to other */
-        sendTransaction( DESTINATION, ORIGIN,"10");
-        getBalance(ORIGIN);
-        getBalance(DESTINATION);
-
-        /* Obtain current ledger */
-        getLedger();
-        getBalance(ORIGIN);
-
-        /* Transactions */
-        sendTransaction(DESTINATION, ORIGIN, "10");
-        getBalance(ORIGIN);
-        getBalance(DESTINATION);
-
-        sendTransaction(ORIGIN, DESTINATION, "10");
-        getBalance(DESTINATION);
-        getBalance(ORIGIN);
-
-        createAccount("432");
-
-        /* Obtain final ledger and global value*/
-        getLedger();
-        getGlobalLedgerValue();
-
-        /* Obtain the total value of account ids */
-        getTotalValue(ORIGIN + "-" + DESTINATION + "-654");
-
-        /* Get extract from account */
-        getExtract(ORIGIN);
-        getExtract(DESTINATION);
+        testCommands();
     }
 
     private static void createAccount(String id) {
@@ -183,5 +142,70 @@ public class TestClient {
 
     private static URI getBaseURI() {
         return UriBuilder.fromUri(BASE_URI).build();
+    }
+
+    private static Client provideAuth() throws Exception {
+        final String certs = System.getProperty("user.dir") + "/certs/client";
+
+        //KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        SSLContext sslContext = SslConfigurator.newInstance()
+                .securityProtocol("TLSv1.2")
+                .trustStoreFile(certs + "/client.truststore")
+                .trustStorePassword("qwerty")
+                .keyStoreFile(certs + "/client.keystore")
+                .keyStorePassword("qwerty")
+                .createSSLContext();
+        return ClientBuilder.newBuilder()
+                .register(HttpAuthenticationFeature.basic("username", "password"))
+                .sslContext(sslContext)
+                .build();
+    }
+
+    private static void testCommands() {
+        /* Initial ledger and global value*/
+        getLedger();
+        getGlobalLedgerValue();
+
+        /* Create new account */
+        createAccount(ORIGIN);
+        createAccount(DESTINATION);
+
+        createAccount(ORIGIN);
+
+        /* Get account balance */
+        getBalance(ORIGIN);
+
+        getBalance("456");
+
+        /* Send transaction money from an account to other */
+        sendTransaction( DESTINATION, ORIGIN,"10");
+        getBalance(ORIGIN);
+        getBalance(DESTINATION);
+
+        /* Obtain current ledger */
+        getLedger();
+        getBalance(ORIGIN);
+
+        /* Transactions */
+        sendTransaction(DESTINATION, ORIGIN, "10");
+        getBalance(ORIGIN);
+        getBalance(DESTINATION);
+
+        sendTransaction(ORIGIN, DESTINATION, "10");
+        getBalance(DESTINATION);
+        getBalance(ORIGIN);
+
+        createAccount("432");
+
+        /* Obtain final ledger and global value*/
+        getLedger();
+        getGlobalLedgerValue();
+
+        /* Obtain the total value of account ids */
+        getTotalValue(ORIGIN + "-" + DESTINATION + "-654");
+
+        /* Get extract from account */
+        getExtract(ORIGIN);
+        getExtract(DESTINATION);
     }
 }
