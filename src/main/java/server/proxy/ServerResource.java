@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.Response;
 import server.ServerRequestType;
 
 import java.io.*;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
@@ -20,8 +21,7 @@ public class ServerResource {
     private ServiceProxy serviceProxy;
 
     public ServerResource() {
-        //TODO: change id from static to dynamic
-        serviceProxy = new ServiceProxy(0);
+        serviceProxy = new ServiceProxy(new SecureRandom().nextInt());
     }
 
     /**
