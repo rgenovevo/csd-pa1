@@ -1,8 +1,10 @@
 package shared;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Transaction {
+public class Transaction implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private int id;
     private String origin;
