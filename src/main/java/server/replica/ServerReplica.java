@@ -7,6 +7,8 @@ import server.ServerRequestType;
 import shared.Ledger;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +41,7 @@ public class ServerReplica extends DefaultSingleRecoverable {
     }
 
     public void serializeLedger() {
-        try (FileOutputStream file = new FileOutputStream("ledgers/ledger-" + id + ".txt");
+        try (FileOutputStream file = new FileOutputStream(Files.createDirectories(Paths.get("ledgers/")).toString() + "/ledger-" + id + ".txt");
              ObjectOutput objOut = new ObjectOutputStream(file) ) {
 
             objOut.writeObject(ledger);
@@ -51,7 +53,7 @@ public class ServerReplica extends DefaultSingleRecoverable {
     }
 
     public boolean checkLedger() {
-        try (FileInputStream file = new FileInputStream("ledgers/ledger-" + id + ".txt");
+        try (FileInputStream file = new FileInputStream(Files.createDirectories(Paths.get("ledgers/")).toString() + "/ledger-" + id + ".txt");
              ObjectInput objOut = new ObjectInputStream(file) ) {
 
             ledger = (Ledger)objOut.readObject();

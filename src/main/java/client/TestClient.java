@@ -21,9 +21,14 @@ public class TestClient {
     public static WebTarget target;
 
     public static void main(String[] args) throws Exception {
-        //Client client = ClientBuilder.newClient(new ClientConfig());
+        System.out.println("Usage: TestClient <server host> <server port>");
+
         Client client = provideAuth();
-        target = client.target(getBaseURI());
+
+        if (args.length < 2)
+            target = client.target(getBaseURI());
+        else
+            target = client.target(getBaseURI(args[0], args[1]));
 
         testCommands();
     }
@@ -143,6 +148,8 @@ public class TestClient {
     private static URI getBaseURI() {
         return UriBuilder.fromUri(BASE_URI).build();
     }
+
+    private static URI getBaseURI(String host, String port) { return UriBuilder.fromUri("https://" + host + ":" + port + "/").build(); }
 
     private static Client provideAuth() throws Exception {
         final String certs = System.getProperty("user.dir") + "/certs/client";

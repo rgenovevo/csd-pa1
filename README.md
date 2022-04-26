@@ -27,8 +27,10 @@ PA1
 ## Testing..
 
   1. Run ServerReplica classes (4) with different arguments from <0-3> <br />
-  2. Run Server class <br />
-  3. Run TestClient class <br />
+  2. Run Server class with arguments <<arg>host> <<arg>port> <br />
+  3. Run TestClient class with arguments <<arg>host> <<arg>port> <br />
+
+  *Can run multiple servers and clients also*
   
   <br />
   Client Terminal (1st Time):
@@ -126,6 +128,15 @@ PA1
 ## Versions
 
 <pre>
+0.4.3
+  Updated README.md
+
+0.4.2
+  Initialize with non-default host and port
+
+0.4.1
+  Fix ledgers file creation
+
 0.4.0
   Ledger-Storage (Object Serialization / File-System)
     - Read on initialization
@@ -138,7 +149,7 @@ PA1
     - Certificates, TrustStores and KeyStores
 
 0.2.3
-  Completed and tested all methods.
+  Completed and tested all methods
     * CreateAccount (LOAD_MONEY)
     * SendTransaction
     * GetBalance
@@ -157,7 +168,7 @@ PA1
   Updated .gitignore
 
 0.1.3
-  Delete unused files.
+  Delete unused files
 
 0.1.1-0.1.2
   Updated README.md
