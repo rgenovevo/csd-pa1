@@ -126,6 +126,9 @@ PA1
 ## Versions
 
 <pre>
+0.4.1
+  Fix ledgers file creation
+
 0.4.0
   Ledger-Storage (Object Serialization / File-System)
     - Read on initialization
@@ -138,7 +141,7 @@ PA1
     - Certificates, TrustStores and KeyStores
 
 0.2.3
-  Completed and tested all methods.
+  Completed and tested all methods
     * CreateAccount (LOAD_MONEY)
     * SendTransaction
     * GetBalance
@@ -157,7 +160,7 @@ PA1
   Updated .gitignore
 
 0.1.3
-  Delete unused files.
+  Delete unused files
 
 0.1.1-0.1.2
   Updated README.md
