@@ -3,7 +3,10 @@
 ## Classes
 
 <pre>
-  src.main.java
+PA1
+  .certs                    // Certificates, TrustStores and KeyStores
+  .config                   // Configs for BFT-SMaRt
+  .src.main.java
     .client
       .TestClient           // Client main class to test and communicate with server.
     .server
@@ -17,7 +20,7 @@
       .Account              // Users can have multiple accounts to operate and control balance.
       .Ledger               // Ledger with all transactions in order and all account balances.
       .Transaction          // Origin, destination and amount of a transaction.
-      .User *TODO*          // Identification and profile of a user.
+      .User                 // Identification and profile of a user.
 </pre>
 
 ## Testing..
@@ -122,6 +125,12 @@
 ## Versions
 
 <pre>
+0.3.0
+  TLS v1.2 for Security Protocol
+    - Client/Server authentication
+    - HTTPS encrypted messages
+    - Certificates, TrustStores and KeyStores
+
 0.2.3
   Completed and tested all methods.
     * CreateAccount (LOAD_MONEY)
