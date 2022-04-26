@@ -10,21 +10,33 @@ public class Ledger implements Serializable {
     private static final String SYSTEM = "System";
 
     private int transactionid;
+    private int global;
     private Set<Transaction> ledger;
     private Map<String, Account> accounts;
 
     public Ledger() {
         transactionid = 0;
+        global = 0;
         ledger = new LinkedHashSet<>();
         accounts = new HashMap<>();
     }
 
     public boolean addBlock(String origin, String destination, int value) {
-        if(checkTransaction(origin, destination, value)) {
-            if(!SYSTEM.equals(origin))
-                accounts.get(origin).addBalance(-value);
-            accounts.get(destination).addBalance(value);
-            return true;
+        if( SYSTEM.equals(origin) || ( accounts.containsKey(origin) && accounts.containsKey(destination) && accounts.get(origin).getBalance() >= value ) ) {
+            Transaction t = new Transaction(transactionid++, origin, destination, value);
+
+            if (t != null) {
+                ledger.add(t);
+
+                if (!SYSTEM.equals(origin)) {
+                    accounts.get(origin).addExtract(t);
+                    accounts.get(origin).addBalance(-value);
+                }
+                accounts.get(destination).addExtract(t);
+                accounts.get(destination).addBalance(value);
+
+                return true;
+            }
         }
 
         return false;
@@ -34,8 +46,12 @@ public class Ledger implements Serializable {
         if(!accounts.containsKey(id)) {
             accounts.put(id, new Account(id));
 
-            if(addBlock(SYSTEM, id, value))
+            if(addBlock(SYSTEM, id, value)) {
+                global += value;
                 return true;
+            }
+
+            accounts.remove(id);
         }
 
         return false;
@@ -48,19 +64,32 @@ public class Ledger implements Serializable {
         return -1;
     }
 
-    private boolean checkTransaction(String origin, String destination, int value) {
-        if(SYSTEM.equals(origin))
-            return ledger.add(new Transaction(transactionid++, origin, destination, value));
-        else
-            if(accounts.containsKey(origin) && accounts.containsKey(destination))
-                if(accounts.get(origin).getBalance() >= value)
-                    return ledger.add(new Transaction(transactionid++, origin, destination, value));
-
-        return false;
-    }
-
     public String getLedger() {
-        return ledger.stream().map(Transaction::toString).collect(Collectors.joining("\n"));
+        return ledger.stream()
+                .map(Transaction::toString)
+                .collect(Collectors.joining("\n"));
     }
-    
+
+    public int getGlobalLedgerValue() {
+        return global;
+    }
+
+    public int getTotalValue(String[] ids) {
+        return accounts.entrySet()
+                .stream()
+                .filter(map -> Arrays.asList(ids).contains(map.getKey()))
+                .mapToInt(map -> map.getValue().getBalance())
+                .sum();
+    }
+
+    public String getExtract(String id){
+            if(accounts.containsKey(id))
+                return accounts.get(id)
+                        .getExtract()
+                        .stream()
+                        .map(Transaction::toString)
+                        .collect(Collectors.joining("\n"));
+
+            return "NULL";
+    }
 }

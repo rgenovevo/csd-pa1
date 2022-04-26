@@ -7,6 +7,7 @@ import server.ServerRequestType;
 import shared.Ledger;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,8 +65,11 @@ public class ServerReplica extends DefaultSingleRecoverable {
              ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
              ObjectOutput objOut = new ObjectOutputStream(byteOut)) {
             ServerRequestType reqType = (ServerRequestType)objIn.readObject();
+
+            String print;
             String account;
             int value;
+
             switch (reqType) {
                 case CREATE:
                     account = (String)objIn.readObject();
@@ -94,7 +98,32 @@ public class ServerReplica extends DefaultSingleRecoverable {
 
                     break;
                 case LEDGER:
-                    String print = ledger.getLedger();
+                    print = ledger.getLedger();
+
+                    objOut.writeBoolean(true);
+                    objOut.writeObject(print);
+
+                    break;
+                case GLOBAL:
+                    value = ledger.getGlobalLedgerValue();
+
+                    objOut.writeBoolean(true);
+                    objOut.writeInt(value);
+
+                    break;
+                case TOTAL:
+                    String[] accounts = (String[])objIn.readObject();
+
+                    value = ledger.getTotalValue(accounts);
+
+                    objOut.writeBoolean(true);
+                    objOut.writeInt(value);
+
+                    break;
+                case EXTRACT:
+                    account = (String)objIn.readObject();
+
+                    print = ledger.getExtract(account);
 
                     objOut.writeBoolean(true);
                     objOut.writeObject(print);
@@ -137,6 +166,31 @@ public class ServerReplica extends DefaultSingleRecoverable {
                     break;
                 case LEDGER:
                     String print = ledger.getLedger();
+
+                    objOut.writeBoolean(true);
+                    objOut.writeObject(print);
+
+                    break;
+                case GLOBAL:
+                    value = ledger.getGlobalLedgerValue();
+
+                    objOut.writeBoolean(true);
+                    objOut.writeInt(value);
+
+                    break;
+                case TOTAL:
+                    String[] accounts = (String[])objIn.readObject();
+
+                    value = ledger.getTotalValue(accounts);
+
+                    objOut.writeBoolean(true);
+                    objOut.writeInt(value);
+
+                    break;
+                case EXTRACT:
+                    account = (String)objIn.readObject();
+
+                    print = ledger.getExtract(account);
 
                     objOut.writeBoolean(true);
                     objOut.writeObject(print);

@@ -35,6 +35,9 @@
     Output:     
      Empty...
     
+    Request:    InboundJaxrsResponse{context=ClientResponse{method=GET, uri=http://localhost:8080/global, status=302, reason=Found}}
+    Output:     Global ledger value: 0
+    
     Request:    InboundJaxrsResponse{context=ClientResponse{method=POST, uri=http://localhost:8080/account/123, status=201, reason=Created}}
     Output:     New account created. {ID = 123}
     
@@ -86,9 +89,31 @@
     Request:    InboundJaxrsResponse{context=ClientResponse{method=GET, uri=http://localhost:8080/account/123, status=302, reason=Found}}
     Output:     Account balance retrieved. { ID = 123 ; Balance = 10 }
     
+    Request:    InboundJaxrsResponse{context=ClientResponse{method=POST, uri=http://localhost:8080/account/432, status=201, reason=Created}}
+    Output:     New account created. {ID = 432}
+    
     Request:    InboundJaxrsResponse{context=ClientResponse{method=GET, uri=http://localhost:8080/ledger, status=302, reason=Found}}
     Output:     
      System -> 123 : 10
+     System -> 321 : 10
+     321 -> 123 : 10
+     123 -> 321 : 10
+     System -> 432 : 10
+    
+    Request:    InboundJaxrsResponse{context=ClientResponse{method=GET, uri=http://localhost:8080/global, status=302, reason=Found}}
+    Output:     Global ledger value: 30
+    
+    Request:    InboundJaxrsResponse{context=ClientResponse{method=GET, uri=http://localhost:8080/total/123-321-654, status=302, reason=Found}}
+    Output:     Total value of the accounts {IDs = [123, 321, 654]}: 20
+    
+    Request:    InboundJaxrsResponse{context=ClientResponse{method=GET, uri=http://localhost:8080/extract/123, status=302, reason=Found}}
+    Output:     
+     System -> 123 : 10
+     321 -> 123 : 10
+     123 -> 321 : 10
+    
+    Request:    InboundJaxrsResponse{context=ClientResponse{method=GET, uri=http://localhost:8080/extract/321, status=302, reason=Found}}
+    Output:     
      System -> 321 : 10
      321 -> 123 : 10
      123 -> 321 : 10
@@ -97,8 +122,18 @@
 ## Versions
 
 <pre>
+0.2.3
+  Completed and tested all methods.
+    * CreateAccount (LOAD_MONEY)
+    * SendTransaction
+    * GetBalance
+    * GetExtract
+    * GetTotalValue
+    * GetGlobalLedgerValue
+    * GetLedger
+
 0.2.0
-  BFT-SMaRt Implementation and Replica creation
+  BFT-SMaRt implementation and Replica creation
     - Server Proxy implementation
     - Server Replica implementation
     - Updated Client Test
