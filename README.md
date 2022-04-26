@@ -126,6 +126,9 @@ PA1
 ## Versions
 
 <pre>
+0.4.2
+  Initialize with non-default host and port
+
 0.4.1
   Fix ledgers file creation
 

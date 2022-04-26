@@ -30,7 +30,7 @@ public class Server {
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
      * @return Grizzly HTTP server.
      */
-    public static HttpServer startServer() throws Exception {
+    public static HttpServer startServer(String uri) throws Exception {
         // create a resource config that scans for JAX-RS resources and providers
         // in grizzly package
         final ResourceConfig rc = new ResourceConfig().packages("server.proxy");
@@ -48,7 +48,7 @@ public class Server {
 
         // create and start a new instance of grizzly http server
         // exposing the Jersey application at BASE_URI
-        return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc, true, new SSLEngineConfigurator(sslContext).setClientMode(false));
+        return GrizzlyHttpServerFactory.createHttpServer(URI.create(uri), rc, true, new SSLEngineConfigurator(sslContext).setClientMode(false));
     }
 
     /**
@@ -57,9 +57,16 @@ public class Server {
      * @throws IOException
      */
     public static void main(String[] args) throws Exception {
-        final HttpServer server = startServer();
-        System.out.println(String.format("Jersey app started with endpoints available at "
-                + "%s%nHit Ctrl-C to stop it...", BASE_URI));
+        System.out.println("Usage: Server <server host> <server port>");
+        String uri;
+        if(args.length < 2)
+            uri = BASE_URI;
+        else
+            uri = "https://" + args[0] + ":" + args[1] + "/";
+
+        final HttpServer server = startServer(uri);
+        System.out.println("Jersey app started with endpoints available at " + uri
+                + "\nHit Ctrl-C to stop it...");
         System.in.read();
         server.stop();
     }
