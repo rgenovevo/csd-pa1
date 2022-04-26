@@ -1,13 +1,17 @@
 package shared;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 public class Account {
     private String id;
     private int balance;
-    // TODO: extracts
+    private Set<Transaction> extract;
 
     public Account(String id) {
         this.id = id;
         balance = 0;
+        extract = new LinkedHashSet<>();
     }
 
     public void addBalance(int value) {
@@ -17,4 +21,8 @@ public class Account {
     public int getBalance() {
         return balance;
     }
+
+    public void addExtract(Transaction t) { extract.add(t); }
+
+    public Set<Transaction> getExtract() { return extract; }
 }
