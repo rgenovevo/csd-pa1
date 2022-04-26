@@ -6,6 +6,7 @@
 PA1
   .certs                    // Certificates, TrustStores and KeyStores
   .config                   // Configs for BFT-SMaRt
+  .ledgers                  // Ledger storage with object serialization
   .src.main.java
     .client
       .TestClient           // Client main class to test and communicate with server.
@@ -125,6 +126,11 @@ PA1
 ## Versions
 
 <pre>
+0.4.0
+  Ledger-Storage (Object Serialization / File-System)
+    - Read on initialization
+    - Write on ordered operations
+
 0.3.0
   TLS v1.2 for Security Protocol
     - Client/Server authentication

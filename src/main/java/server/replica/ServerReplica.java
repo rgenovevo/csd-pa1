@@ -7,7 +7,6 @@ import server.ServerRequestType;
 import shared.Ledger;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +14,8 @@ public class ServerReplica extends DefaultSingleRecoverable {
 
     private Ledger ledger;
     private Logger logger;
+
+    private int id;
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -26,12 +27,42 @@ public class ServerReplica extends DefaultSingleRecoverable {
     }
 
     public ServerReplica(int id) {
-        ledger = new Ledger();
+        this.id = id;
         logger = Logger.getLogger(ServerReplica.class.getName());
+
+        if(!checkLedger())
+            ledger = new Ledger();
 
         // create and start a new instance of bft-smart server replica
         // access to un/ordered and snapshot override methods
         new ServiceReplica(id, this, this);
+    }
+
+    public void serializeLedger() {
+        try (FileOutputStream file = new FileOutputStream("ledgers/ledger-" + id + ".txt");
+             ObjectOutput objOut = new ObjectOutputStream(file) ) {
+
+            objOut.writeObject(ledger);
+            objOut.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean checkLedger() {
+        try (FileInputStream file = new FileInputStream("ledgers/ledger-" + id + ".txt");
+             ObjectInput objOut = new ObjectInputStream(file) ) {
+
+            ledger = (Ledger)objOut.readObject();
+
+            return true;
+        } catch (IOException | ClassNotFoundException e) {
+            if(!e.getClass().equals(FileNotFoundException.class))
+                e.printStackTrace();
+        }
+
+        return false;
     }
 
     @Override
@@ -78,6 +109,7 @@ public class ServerReplica extends DefaultSingleRecoverable {
                     objOut.writeBoolean(true);
                     objOut.writeBoolean(ledger.createAccount(account, value));
 
+                    serializeLedger();
                     break;
                 case BALANCE:
                     account = (String)objIn.readObject();
@@ -96,6 +128,7 @@ public class ServerReplica extends DefaultSingleRecoverable {
                     objOut.writeBoolean(true);
                     objOut.writeBoolean(ledger.addBlock(origin, destination, value));
 
+                    serializeLedger();
                     break;
                 case LEDGER:
                     print = ledger.getLedger();
