@@ -5,6 +5,7 @@ import jakarta.ws.rs.core.*;
 import org.glassfish.jersey.client.ClientConfig;
 
 import java.net.URI;
+import java.util.Arrays;
 
 public class TestClient {
     // Base URI the Grizzly HTTP server will listen on
@@ -21,8 +22,9 @@ public class TestClient {
         Client client = ClientBuilder.newClient(new ClientConfig());
         target = client.target(getBaseURI());
 
-        /* Initial ledger */
+        /* Initial ledger and global value*/
         getLedger();
+        getGlobalLedgerValue();
 
         /* Create new account */
         createAccount(ORIGIN);
@@ -53,8 +55,18 @@ public class TestClient {
         getBalance(DESTINATION);
         getBalance(ORIGIN);
 
-        /* Obtain final ledger */
+        createAccount("432");
+
+        /* Obtain final ledger and global value*/
         getLedger();
+        getGlobalLedgerValue();
+
+        /* Obtain the total value of account ids */
+        getTotalValue(ORIGIN + "-" + DESTINATION + "-654");
+
+        /* Get extract from account */
+        getExtract(ORIGIN);
+        getExtract(DESTINATION);
     }
 
     private static void createAccount(String id) {
@@ -74,8 +86,7 @@ public class TestClient {
     }
 
     private static void getBalance(String id) {
-        Invocation.Builder inv = target
-                .path("account")
+        Invocation.Builder inv = target.path("account")
                 .path(id)
                 .request();
 
@@ -123,13 +134,52 @@ public class TestClient {
         System.out.println("Output:     \n" + output);
     }
 
+    private static void getGlobalLedgerValue() {
+        Invocation.Builder inv = target.path("global")
+                .request();
 
-    /**
-     * TODO:
-     *   GetExtract();
-     *   GetTotalValue();
-     *   GetGlobalLedgerValue();
-     */
+        Response response = inv.accept(MediaType.TEXT_PLAIN)
+                .get(Response.class);
+
+        String output = response.readEntity(String.class);
+        String request = response.toString();
+
+        System.out.println();
+        System.out.println("Request:    " + request);
+        System.out.println("Output:     " + output);
+    }
+
+    private static void getTotalValue(String ids) {
+        Invocation.Builder inv = target.path("total")
+                .path(ids)
+                .request();
+
+        Response response = inv.accept(MediaType.TEXT_PLAIN)
+                .get(Response.class);
+
+        String output = response.readEntity(String.class);
+        String request = response.toString();
+
+        System.out.println();
+        System.out.println("Request:    " + request);
+        System.out.println("Output:     " + output);
+    }
+
+    private static void getExtract(String id) {
+        Invocation.Builder inv = target.path("extract")
+                .path(id)
+                .request();
+
+        Response response = inv.accept(MediaType.TEXT_PLAIN)
+                .get(Response.class);
+
+        String output = response.readEntity(String.class);
+        String request = response.toString();
+
+        System.out.println();
+        System.out.println("Request:    " + request);
+        System.out.println("Output:     \n" + output);
+    }
 
     private static URI getBaseURI() {
         return UriBuilder.fromUri(BASE_URI).build();
